@@ -1,0 +1,9 @@
+{
+  "editor.tokenColorCustomizations": {
+    "keywords": "#C586C0",
+    "registers": "#9CDCFE",
+    "constants": "#4FC1FF",
+    "destination": "#CE9178",
+    "comments": "#FF0000"
+  }
+}

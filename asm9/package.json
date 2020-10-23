@@ -1,0 +1,32 @@
+{
+    "name": "asm9",
+    "displayName": "ASM9",
+    "description": "Syntax highlighting for 9-bit asm",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.50.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "asm9",
+            "aliases": ["asm9", "asm9"],
+            "extensions": [".s9"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "asm9",
+            "scopeName": "source.s9",
+            "path": "./syntaxes/asm9.tmLanguage.json"
+        }],
+        "themes": [
+            {
+                "label": "asm9 Theme",
+                "uiTheme": "vs-dark",
+                "path": "./syntax/asm9.tmTmeme"
+            }
+        ]
+    }
+}

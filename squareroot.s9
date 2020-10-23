@@ -1,0 +1,30 @@
+# Program to take the square root of a two-byte number
+# Input number is in addresses 16 and 17, output goes in 18
+
+# Allocate 20 and 21 for x, 22 and 23 for b
+SETQ 20
+MOV 0 F
+CLR 0 Q
+SW 0 0
+SW 0 1
+
+SETQ 16
+MOV $0 F
+LW $0 0
+CLR $1 F
+CMP $1
+BEQ 2 #TODO
+# This code only executes if the first byte of N is not zero
+# Next:
+LW $0 1
+CMP $1
+BNE 1
+HALT
+# $2 = 1
+# WHILE $2 < *17
+#   $2 = $2 << 2
+CLR $2 F
+INC $2 F
+INC $2 F
+CMP $2
+BLT 4

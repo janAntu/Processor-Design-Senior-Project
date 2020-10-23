@@ -1,0 +1,22 @@
+# 0x0193 - 0x0255 = FF3E
+# [1,147] - [2,85] = [255,62]
+# 597 - 403 = 194
+SETQ 1
+MOV $1 F
+SETQ 147
+MOV $2 F
+
+# Actual multiplication
+CLR $3 F
+SETQ 85
+CMP $2
+BGE 1
+INC $3 F
+SUB $2 F
+SETQ 2
+ADD $3 Q
+CLR $3 F
+CMP $1
+BGE 1
+INC $3 F
+SUB $1 F

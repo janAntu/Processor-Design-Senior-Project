@@ -1,0 +1,24 @@
+# int $0 = 1;
+# int $1 = 0;
+# int $3 = 10;
+  SETQ 1
+  MOV 0 F
+  SETQ 0
+  MOV 1 F
+  SETQ 10
+  MOV 3 F
+
+# while $0 < $3 {
+#   $1 = $1 + $0;
+#   $0 += 1;
+# }
+START_LOOP:
+  MOV 3 Q
+  CMP 0
+  BEQ END_LOOP
+  MOV 0 Q
+  ADD 1 F
+  INC 0 F
+  JUMP START_LOOP
+END_LOOP:
+  HALT

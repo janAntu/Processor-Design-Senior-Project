@@ -1,0 +1,59 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "asm9",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#registers"
+		},
+		{
+			"include": "#constants"
+		},
+		{
+			"include": "#destination"
+		},
+		{
+			"include": "#comments"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.asm9",
+				"match": "\\b(JUMP|SUB|DEC|IOR|AND|XOR|ADD|MOV|COM|INC|LSL|CLR|LSR|CMP|LW|SW|BEQ|BNE|BLT|BGT|SETQ)\\b"
+			}]
+		},
+		"registers": {
+			"patterns": [{
+				"name": "registers.control.asm9",
+				"match": "\\b($[0-3])\\b"
+			}]
+		},
+		"constants": {
+			"patterns": [{
+				"name": "registers.control.asm9",
+				"match": "\\b[0-9]+\\b"
+			}]
+		},
+		"destination": {
+			"patterns": [{
+				"name": "registers.control.asm9",
+				"match": "\\b(F|Q)\\b"
+			}]
+		},
+		"comments": {
+			"name": "comments.quoted.double.asm9",
+			"begin": "#",
+			"end": "",
+			"patterns": [
+				{
+					"name": "constant.character.escape.asm9",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.s9"
+}
