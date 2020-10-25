@@ -2,7 +2,7 @@ import sys
 import re
 
 BRANCH_OPS = ['beq', 'bne', 'blt', 'bge']
-ALU_OPS = ['sub', 'dec', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
+ALU_OPS = ['sub', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
 LS_OPS = ['lw', 'sw']
 MISC_OPS = ['cmp', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp']
 
@@ -51,14 +51,12 @@ class Processor:
     for i in range(len(lines)):
       tokens = lines[i].split()
       if tokens[-1] in labels.keys():
-        print("Old line: " + lines[i])
         # If mnemonic is a setq, we just add the label destination
         if tokens[0] == 'setq':
           lines[i] = 'setq ' + str(labels[tokens[-1]])
         elif tokens[0].lower() in BRANCH_OPS:
           offset = labels[tokens[-1]] - i
           lines[i] = tokens[0] + ' ' + str(offset)
-        print("New line: " + lines[i])
     
     # Replace instructions with new instructions
     self.instructions = lines
@@ -70,7 +68,7 @@ class Processor:
       instr = instr.split('#')[0]
       # If instruction is "print", output memory to stderr
       if instr == "print":
-        sys.stderr.write(str(self.memory[8:16]) + '\n')
+        sys.stderr.write(str(self.memory[16:22]) + '\n')
     else:
       instr = "---------"
     return "PC: {0}\tInst: {1}\tRegs: {2}\tQ: {3}".format(
@@ -82,8 +80,9 @@ class Processor:
       if log == 'EVERY':
         print(self)
       self.run()
-    print(self)
-    print("Memory:\n", self.memory[:24])
+    if log != 'NONE':
+      print(self)
+      print("Memory:\n", self.memory[:24])
 
   def run(self):
     # Get the operations and operands from the instruction
@@ -126,12 +125,11 @@ class Processor:
     result = None
     if op == 'sub':
       result = f - self.W
-      if result < 0:
-        self.C_flag = True
-        result += 256
+      self.C_flag = result < 0
+      result %= 256
     if op == 'dec':
       result = f - 1
-    if op == 'or':
+    if op == 'or' or op == 'ior':
       result = f | self.W
     if op == 'and':
       result = f & self.W
@@ -141,19 +139,24 @@ class Processor:
       result = f ^ self.W
     if op == 'add':
       result = f + self.W
+      self.C_flag = result > 255
+      result %= 256
     if op == 'mov':
       result = f if dest == 'q' else self.W
     if op == 'com':
-      result = ~f
+      result = ~f % 256
     if op == 'inc':
-      result = f + 1
+      result = (f + 1) % 256
     if op == 'decs':
-      result = f - 1
+      result = (f - 1) % 256
       self.PC += 1
     if op == 'lsl':
       result = f << 1
       self.C_flag = result > 255
       result = result % 256
+    if op == 'lsr':
+      self.C_flag = f & 1 != 0
+      result = f >> 1
     if op == 'clr':
       result = 0
     if op == 'swap':
@@ -190,23 +193,45 @@ class Processor:
     elif ops[0] == 'jumpq':
       self.PC = self.W
     elif ops[0] == 'rlc':
-      self.W = (self.Q << 1) + 1 if self.C_flag else 0
+      self.W = (self.W << 1) + (1 if self.C_flag else 0)
       self.C_flag = self.W > 255
       self.W %= 256
     elif ops[0] == 'rrc':
       new_carry = self.W & 1 == 1
-      self.W = (self.Q >> 1) + 128 if self.C_flag else 0
+      self.W = (self.W >> 1) + (128 if self.C_flag else 0)
       self.C_flag = new_carry
     elif ops[0] == 'setfp':
       self.FP = self.W
 
+def test(filename, mem=[], log='EVERY'):
+  with open(filename, 'r') as file:
+    lines = [l.strip() for l in file]
+    proc = Processor(lines, mem=mem)
+    proc.run_all(log=log)
+    return proc
 
+def test_sqrt():
+  results = dict()
+  for n in range(65536):
+    n1, n0 = n / 256, n % 256
+    expected = int(n**0.5)
+    mem = [0]*16 + [n1, n0]
+    proc = test('squareroot.s9', mem=mem, log='END')
+    results[n] = proc.memory[18]
+  error = 0
+  for input, actual in results.items():
+    expected = input**0.5
+    if abs(expected - actual) > 1:
+      error += 1
+      print("Input: {0}, Expected: {1}, Actual: {2}".format(
+        input, expected, actual
+      ))
+  print("Error: {0}/{1}".format(error, len(results)))
+
+test_sqrt()
+'''
+mem = [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 1, 0, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 else:
-  filename = sys.argv[1]
-  with open(filename, 'r') as file:
-    lines = [l.strip() for l in file]
-    mem = [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    proc = Processor(lines, mem=mem)
-    proc.run_all(log='EVERY')
+  test(sys.argv[1], mem=mem)'''
