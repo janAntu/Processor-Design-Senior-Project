@@ -209,7 +209,7 @@ def test(filename, mem=[], log='EVERY'):
     proc = Processor(lines, mem=mem)
     proc.run_all(log=log)
     return proc
-
+'''
 def test_sqrt():
   results = dict()
   for n in range(65536):
@@ -234,4 +234,4 @@ mem = [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 1, 0, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 else:
-  test(sys.argv[1], mem=mem)'''
+  test(sys.argv[1], mem=mem)
