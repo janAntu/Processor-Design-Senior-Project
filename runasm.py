@@ -127,6 +127,7 @@ class Processor:
     if op == 'sub':
       result = f - self.W
       self.B_flag = result < 0
+      self.C_flag = self.B_flag
       result %= 256
     if op == 'dec':
       result = f - 1
@@ -135,12 +136,14 @@ class Processor:
     if op == 'and':
       result = f & self.W
       self.B_flag = result > 255
+      self.C_flag = self.B_flag
       result = result % 256
     if op == 'xor':
       result = f ^ self.W
     if op == 'add':
       result = f + self.W
       self.B_flag = result > 255
+      self.C_flag = self.B_flag
       result %= 256
     if op == 'mov':
       result = f if dest == 'q' else self.W
@@ -154,9 +157,11 @@ class Processor:
     if op == 'lsl':
       result = f << 1
       self.B_flag = result > 255
+      self.C_flag = self.B_flag
       result = result % 256
     if op == 'lsr':
       self.B_flag = f & 1 != 0
+      self.C_flag = self.B_flag
       result = f >> 1
     if op == 'clr':
       result = 0
@@ -192,7 +197,6 @@ class Processor:
       f = self.regs[int(ops[1])]
       self.Z_flag = self.W == f
       self.B_flag = f < self.W
-      return
     elif ops[0] == 'halt':
       self.PC = len(self.instructions)
     elif ops[0] == 'setq':
@@ -202,20 +206,22 @@ class Processor:
     elif ops[0] == 'rlc':
       self.W = (self.W << 1) + (1 if self.C_flag else 0)
       self.B_flag = self.W > 255
+      self.C_flag = self.B_flag
       self.W %= 256
     elif ops[0] == 'rrc':
       new_carry = self.W & 1 == 1
       self.W = (self.W >> 1) + (128 if self.C_flag else 0)
       self.B_flag = new_carry
+      self.C_flag = self.B_flag
     elif ops[0] == 'setfp':
       self.FP = self.W
     elif ops[0] == 'cplc':
       self.B_flag = not (self.C_flag)
+      self.C_flag = self.B_flag
       print("invert")
     elif ops[0] == 'clrc':
       self.B_flag = False
-    # Make sure C and B flags match
-    self.C_flag = self.B_flag
+      self.C_flag = self.B_flag
 
 def test(filename, mem=[], log='EVERY'):
   with open(filename, 'r') as file:
