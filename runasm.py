@@ -1,10 +1,10 @@
 import sys
 import re
 
-BRANCH_OPS = ['beq', 'bne', 'blt', 'bge']
+BRANCH_OPS = ['beq', 'bne', 'blt', 'bge', 'jnc']
 ALU_OPS = ['sub', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
 LS_OPS = ['lw', 'sw']
-MISC_OPS = ['cmp', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp']
+MISC_OPS = ['cmp', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp','cplc','clrc']
 
 class Processor:
 
@@ -16,7 +16,7 @@ class Processor:
     self.regs = [0, 0, 0, 0]
     self.W = 0
     self.FP = 0
-    self.Z_flag, self.C_flag = False, False
+    self.Z_flag, self.C_flag, self.B_flag = False, False, False
 
     # Copy the initial memory to our array
     for i in range(len(mem)):
@@ -71,8 +71,8 @@ class Processor:
         sys.stderr.write(str(self.memory[16:22]) + '\n')
     else:
       instr = "---------"
-    return "PC: {0}\tInst: {1}\tRegs: {2}\tQ: {3}".format(
-          self.PC, instr, self.regs, self.W)
+    return "PC: {0}\tInst: {1}\tRegs: {2}\tQ: {3}\tC: {4}".format(
+          self.PC, instr, self.regs, self.W, self.C_flag)
 
   def run_all(self, log='END'):
     self.preprocess()
@@ -113,8 +113,9 @@ class Processor:
     op, offset = ops[0], int(ops[1])
     if ((op == 'beq' and self.Z_flag == True) or
         (op == 'bne' and self.Z_flag == False) or
-        (op == 'blt' and self.C_flag == True) or
-        (op == 'bge' and self.C_flag == False)):
+        (op == 'blt' and self.B_flag == True) or
+        (op == 'jnc' and self.C_flag == False) or
+        (op == 'bge' and self.B_flag == False)):
       
       # Update the program counter
       self.PC += offset
@@ -152,10 +153,10 @@ class Processor:
       self.PC += 1
     if op == 'lsl':
       result = f << 1
-      self.C_flag = result > 255
+      self.B_flag = result > 255
       result = result % 256
     if op == 'lsr':
-      self.C_flag = f & 1 != 0
+      self.B_flag = f & 1 != 0
       result = f >> 1
     if op == 'clr':
       result = 0
@@ -177,15 +178,17 @@ class Processor:
     if op == 'lw':
       # Load value from memory into accumulator
       self.W = self.memory[self.regs[reg] + offset]
+      print(self.memory[:8])
     elif op == 'sw':
       # Store value from accumulator into memory
       self.memory[self.regs[reg] + offset] = self.W
+      print(self.memory[:8])
 
   def run_misc(self, ops):
     if ops[0] == 'cmp':
       f = self.regs[int(ops[1])]
       self.Z_flag = self.W == f
-      self.C_flag = f < self.W
+      self.B_flag = f < self.W
     elif ops[0] == 'halt':
       self.PC = len(self.instructions)
     elif ops[0] == 'setq':
@@ -202,6 +205,11 @@ class Processor:
       self.C_flag = new_carry
     elif ops[0] == 'setfp':
       self.FP = self.W
+    elif ops[0] == 'cplc':
+      self.C_flag = not (self.C_flag)
+      print("invert")
+    elif ops[0] == 'clrc':
+      self.C_flag = False
 
 def test(filename, mem=[], log='EVERY'):
   with open(filename, 'r') as file:
@@ -230,7 +238,7 @@ def test_sqrt():
 
 test_sqrt()
 '''
-mem = [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 1, 0, 0]
+mem = [0, 179, 8,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 else:
