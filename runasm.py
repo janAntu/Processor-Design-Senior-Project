@@ -126,7 +126,7 @@ class Processor:
     result = None
     if op == 'sub':
       result = f - self.W
-      self.C_flag = result < 0
+      self.B_flag = result < 0
       result %= 256
     if op == 'dec':
       result = f - 1
@@ -134,13 +134,13 @@ class Processor:
       result = f | self.W
     if op == 'and':
       result = f & self.W
-      self.C_flag = result > 255
+      self.B_flag = result > 255
       result = result % 256
     if op == 'xor':
       result = f ^ self.W
     if op == 'add':
       result = f + self.W
-      self.C_flag = result > 255
+      self.B_flag = result > 255
       result %= 256
     if op == 'mov':
       result = f if dest == 'q' else self.W
@@ -173,6 +173,9 @@ class Processor:
     else:
       self.regs[reg] = result
 
+    # Make sure C flag is the same as B flag
+    self.C_flag = self.B_flag
+
   def run_ls(self, ops):
     op, reg, offset = ops[0], int(ops[1]), int(ops[2])
     if op == 'lw':
@@ -189,6 +192,7 @@ class Processor:
       f = self.regs[int(ops[1])]
       self.Z_flag = self.W == f
       self.B_flag = f < self.W
+      return
     elif ops[0] == 'halt':
       self.PC = len(self.instructions)
     elif ops[0] == 'setq':
@@ -197,19 +201,21 @@ class Processor:
       self.PC = self.W
     elif ops[0] == 'rlc':
       self.W = (self.W << 1) + (1 if self.C_flag else 0)
-      self.C_flag = self.W > 255
+      self.B_flag = self.W > 255
       self.W %= 256
     elif ops[0] == 'rrc':
       new_carry = self.W & 1 == 1
       self.W = (self.W >> 1) + (128 if self.C_flag else 0)
-      self.C_flag = new_carry
+      self.B_flag = new_carry
     elif ops[0] == 'setfp':
       self.FP = self.W
     elif ops[0] == 'cplc':
-      self.C_flag = not (self.C_flag)
+      self.B_flag = not (self.C_flag)
       print("invert")
     elif ops[0] == 'clrc':
-      self.C_flag = False
+      self.B_flag = False
+    # Make sure C and B flags match
+    self.C_flag = self.B_flag
 
 def test(filename, mem=[], log='EVERY'):
   with open(filename, 'r') as file:
@@ -238,7 +244,7 @@ def test_sqrt():
 
 test_sqrt()
 '''
-mem = [0, 179, 8,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+mem = [0, 179, 8,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 17, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 else:
