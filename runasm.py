@@ -178,9 +178,6 @@ class Processor:
     else:
       self.regs[reg] = result
 
-    # Make sure C flag is the same as B flag
-    self.C_flag = self.B_flag
-
   def run_ls(self, ops):
     op, reg, offset = ops[0], int(ops[1]), int(ops[2])
     if op == 'lw':
