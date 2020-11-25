@@ -14,7 +14,7 @@
 # }
 START_LOOP:
   MOV 3 Q
-  CMP 0
+  CMPZ 0
   BEQ END_LOOP
   MOV 0 Q
   ADD 1 F

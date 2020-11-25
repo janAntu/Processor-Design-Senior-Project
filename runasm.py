@@ -4,7 +4,7 @@ import re
 BRANCH_OPS = ['beq', 'bne', 'blt', 'bge', 'jnc']
 ALU_OPS = ['sub', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
 LS_OPS = ['lw', 'sw']
-MISC_OPS = ['cmp', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp','cplc','clrc']
+MISC_OPS = ['cmp', 'cmpz', 'cmpc', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp', 'cplc', 'clrc']
 
 class Processor:
 
@@ -60,7 +60,113 @@ class Processor:
     
     # Replace instructions with new instructions
     self.instructions = lines
-        
+  
+  def assemble_single(self, instr):
+    bit_string = ""
+    ops = instr.replace('$', '').replace(',', '').split()
+    # Helper function to convert integer to fixed-width binary
+    binary = lambda x, width: format(x, '0{0}b'.format(width))
+
+    # Translate instruction according to instruction type
+    op = ops[0]
+    if op == 'setq':
+      # Ensure that literal value is between 0 and 127
+      literal = int(ops[1])
+      assert literal < 128 and literal >= 0, "Literal value {0} out of range".format(literal)
+      bit_string = '11' + binary(literal, 7)
+
+    elif op in BRANCH_OPS:
+      # Add opcode and function code for operation
+      bit_string += '10'
+      bit_string += {
+        'beq': '00',
+        'bne': '01',
+        'blt': '10',
+        'bgt': '11'
+      }.get(op, None)
+      # Ensure that literal value is between 0 and 31
+      offset = int(ops[1])
+      assert offset < 32 and offset >= 0, "Offset value {0} out of range".format(offset)
+      bit_string += binary(offset, 5)
+
+    elif op in ALU_OPS:
+      # Replace mov ## q/f with movq/movf ##
+      if op == 'mov':
+        op += ops[2]
+      # Add opcode and function code for operation
+      bit_string += '00'
+      bit_string += {
+        'sub': '0010',
+        'dec': '0011',
+        'ior': '0100',
+        'and': '0101',
+        'xor': '0110',
+        'add': '0111',
+        'movq': '1000',
+        'com': '1001',
+        'inc': '1010',
+        'movf': '1011',
+        'lsl': '1100',
+        'clr': '1101',
+        'lsr': '1110'
+      }.get(op, None)
+
+      # Add destination bit for F or Q
+      dest = ops[2]
+      assert dest == 'f' or dest == 'q', "Invalid destination bit {0}".format(dest)
+      bit_string += '0' if dest =='q' else '1'
+      # Ensure that literal value is between 0 and 3
+      register = int(ops[1])
+      assert register < 4 and register >= 0, "Register value {0} out of range".format(register)
+      bit_string += binary(register, 2)
+
+    elif op in LS_OPS:
+      bit_string += '01'
+      bit_string += '00' if op == 'lw' else '01'
+      # Ensure that literal value is between 0 and 8
+      offset = int(ops[2])
+      assert offset < 8 and offset >= 0, "Offset value {0} out of range".format(offset)
+      bit_string += binary(offset, 3)
+      # Ensure that literal value is between 0 and 3
+      register = int(ops[1])
+      assert register < 4 and register >= 0, "Register value {0} out of range".format(register)
+      bit_string += binary(register, 2)
+
+    elif op in MISC_OPS:
+      bit_string += '00'
+      bit_string += {
+        'halt': '0000000',
+        'jumpq': '0000001',
+        'rrc': '0000100',
+        'rlc': '0000101',
+        'cplc': '0000110',
+        'clrc': '0000111',
+        'cmpz': '00010',
+        'cmpc': '00011'
+      }.get(op, None)
+      # Add register for CMPZ or CMPC
+      if op == 'cmpz' or op == 'cmpc':
+        # Ensure that literal value is between 0 and 3
+        register = int(ops[1])
+        assert register < 4 and register >= 0, "Register value {0} out of range".format(register)
+        bit_string += binary(register, 2)
+
+    assert len(bit_string) == 9, "Assembler error on instruction '{0}' translated as {1}".format(instr, bit_string)
+    print(bit_string, '  ', instr)
+    return bit_string
+
+  def assemble(self, filename):
+    # Transform instructions into a list of 9-bit binary strings
+    self.preprocess()
+    bitstr_iter = map(self.assemble_single, self.instructions)
+    bitstr = ''.join(bitstr_iter)
+    # Append trailing zeroes so that length is a multiple of 8
+    bitstr += '0'*(8 - (len(bitstr)) % 8)
+    # Convert binary string to an array of bytes
+    byte_array = int(bitstr, 2).to_bytes(len(bitstr)//8, 'big')
+    print(byte_array)
+    with open(filename, 'wb') as fout:
+      fout.write(byte_array)
 
   def __repr__(self):
     if self.PC < len(self.instructions):
@@ -250,5 +356,10 @@ test_sqrt()
 mem = [0, 179, 8,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 17, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
-else:
+elif len(sys.argv) == 2:
   test(sys.argv[1], mem=mem)
+elif len(sys.argv) == 3:
+  with open(sys.argv[1], 'r') as file:
+    lines = [l.strip() for l in file]
+    proc = Processor(lines, mem=mem)
+    proc.assemble(sys.argv[2])
