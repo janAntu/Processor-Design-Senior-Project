@@ -1,0 +1,7 @@
+SETQ 1
+MOV 0 F
+LW 0 0
+MOV 1 F
+LW 0 1
+SUB 1 Q
+SW 0 2

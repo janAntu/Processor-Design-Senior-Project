@@ -1,0 +1,134 @@
+# Program to take the square root of a two-byte number
+# Input number is in addresses 16 and 17, output goes in 18
+
+  # Allocate 20 and 21 for x, 22 and 23 for b
+  SETQ 16
+  MOV $0 F
+  CLR 0 Q
+  SW $0 2
+  SW $0 3
+  SW $0 4
+  SW $0 5  # Zero out x and b
+
+  # If input is 0, return early
+  LW $0 0
+  CLR $1 F
+  CMP $1
+  BNE input_validated
+  LW $0 1
+  CMP $1
+  BNE input_validated
+  HALT
+input_validated:
+  # Step 2: Set B to highest power of 4 <= N
+  LW $0 0   # Set Q to N[0]
+  CMP $1    # Compare Q to 0
+  BNE end_if1
+  INC $0 F  # Moves the frame pointer
+end_if1:
+  SETQ 64   # Set byte of B to 01000000
+  MOV $2 F  # Move B[x] to $2
+  LW $0 0
+  MOV $1 F  # Set $1 to largest nonzero byte of N
+while_start:
+  MOV $2 Q  # Set Q to B[x]
+  CMP $2    # Compare B[x] to N[x]
+  BGE while_end
+  LSR $2 F
+  LSR $2 F  # Shift B[x] 2 bits to the right
+  JUMP while_start
+while_end:
+  MOV $2 Q  # Move B[x] to Q
+  SW $0 4   # Store B[x] as B[0] or B[1]
+  SETQ 16
+  MOV $0 F  # Restore the frame pointer
+
+# Part 3: Calculate square root, digit-by-digit
+big_loop_begin:
+  # First, calculate n - x - b
+  # We'll do x + b first
+  LW $0 4
+  MOV $2 F  # Store MSB of B in $2
+  LW $0 5
+  MOV $3 F  # Store LSB of B in $3
+  LW $0 3   # Set Q to X[1]
+  ADD $3 F  # F[1] = F[1] + X[1]
+  BGE no_carry  # If carry bit not set, skip
+  INC $2 F  # If carry was set, add 1 to B[0]
+no_carry:
+  LW $0 2   # Set Q to X[0]
+  ADD $2 F  # F[0] = F[0] + X[0]
+  # Next, calculate n - (b + x)
+  LW $0 1   # Set Q to LSB of N
+  MOV $1 F  # Set $1 to LSB of N
+  MOV $3 Q  # Move $3 to Q we can subtract it from N
+  SUB $1 Q  # Subtract $3 from N[1]
+  BGE no_borrow # If carry bit not set, skip
+  INC $2 F  # Lol I hope this works
+no_borrow:
+  MOV $3 F  # Move new LSB to $3
+  LW $0 0   # Set Q to MSB of N
+  MOV $1 F  # Set $1 to MSB of N
+  MOV $2 Q  # Move $2 to Q we can subtract it from N
+  SUB $1 Q  # Subtract $2 from N[1]
+  MOV $2 F  # Move new MSB to $2
+  BLT else
+  # Set N to N - B - X in memory
+  MOV $2 Q
+  SW $0 0
+  MOV $3 Q
+  SW $0 1
+  # X = X/2 + B
+  LW $0 5   # Set Q to LSB of B
+  MOV $3 F  # Set $3 to LSB of B
+  LW $0 4   # Set Q to MSB of B
+  LSL $3 F  # Shift LSB to the left
+  RLC       # Shift MSB left and add carry
+  MOV $2 F  # Set $2 to MSB of B
+  JUMP end_if2  # Skip to actual leftshift
+else:
+  # X = X/2
+  CLR $2 F  # Set $2 to 0
+  CLR $3 F  # Set $3 to 0
+end_if2:
+  # X = X/2 + whatever's in $3,$4
+  SETQ 64
+  MOV $1 F
+  LSL $1 F  # Set $1 to 128; we'll use this later
+  LW $0 3   # Set Q to LSB of X
+  ADD $3 F  # Add LSB of X to $3
+  LSR $3 F  # Shift LSB of X to the right
+  LW $0 2   # Set Q to MSB of X
+  ADD $2 F  # Add MSB of X to $2
+  LSR $2 F  # Shift MSB of X to the right
+  BGE end_lsr_x # If no carry, skip
+  MOV $1 Q  # Set Q to 128
+  ADD $3 F  # Set leftmost bit of LSB to 1
+end_lsr_x:
+  MOV $2 Q
+  SW $0 2   # Store MSB of X to memory
+  MOV $3 Q
+  SW $0 3   # Store LSB of X to memory
+  # B = B/4
+  CLR $1 F  # Set $1 to 0; we'll use this later
+  LW $0 4
+  MOV $2 F  # Set $2 to MSB of B
+  LW $0 5   # Set Q to LSB of B
+  LSR $2 F  # Shift MSB to the right
+  RRC       # Shift LSB right and add carry
+  LSR $2 F  # Shift MSB to the right
+  RRC       # Shift LSB right and add carry
+  SW $0 5   # Store LSB of B to memory
+  IOR $1 F  # $1 = $1 OR LSB of B
+  MOV $2 Q
+  SW $0 4   # Store MSB of B to memory
+  IOR $1 F  # $1 = $1 OR MSB of B
+  # MSB is now zero if B == 0
+  CLR $3 Q  # Set Q to 0
+print
+  CMP $1    # If B != 0, loop again
+  BNE big_loop_begin
+  # Now that the square root is in 18 and 19, move *19 to *18
+  LW $0 3
+  SW $0 2
+  HALT
