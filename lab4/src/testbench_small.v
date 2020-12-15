@@ -5,7 +5,7 @@
 //  reads and verifies result from DUT against its own computation
 // Based on SystemVerilog source code provided by John Eldon
  
-module test_bench_1();
+module test_bench_small();
 
 
   reg      clk   = 1'b0   ;      // advances simulation step-by-step
@@ -43,9 +43,6 @@ initial begin
 // launch program 1
   start = 1;
   #20;  init = 0;
-  // *** try various values here ***
-// your memory gets loaded here
-// *** change names of memory or its guts as needed ***
   #20; start = 0;
   #20;
   wait(done);

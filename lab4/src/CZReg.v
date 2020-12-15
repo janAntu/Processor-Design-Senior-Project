@@ -24,8 +24,6 @@ module CZReg (Clk,WriteEn,ZIn,CIn,ZOut,COut);
 reg [W-1:0] ZeroFlag;
 reg [W-1:0] CarryFlag;
 
-
-
 // NOTE:
 // READ is combinational
 // WRITE is sequential
@@ -36,11 +34,10 @@ begin
  COut = CarryFlag;
 end
 
-// sequential (clocked) writes 
-always @ (posedge Clk)
-  if (WriteEn) begin
+// sequential (clocked) writes
+always @ (posedge Clk) begin
 		ZeroFlag <= ZIn;
 		CarryFlag <= CIn;
-	end
+end
 
 endmodule

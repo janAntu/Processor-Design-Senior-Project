@@ -102,8 +102,8 @@ module CPU(Reset, Start, Clk,Ack);
 		.WriteEn   (RegWrEn), 
 		.ZIn    (ZeroIn),
 		.CIn    (CarryIn), 
-		.ZOut  (ZeroIn),
-		.COut  (CarryIn)
+		.ZOut  (ZeroOut),
+		.COut  (CarryOut)
 	);
 	
 	

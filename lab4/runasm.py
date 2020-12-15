@@ -228,6 +228,7 @@ class Processor:
     result = None
     if op == 'sub':
       result = f - self.W
+      #if self.C_flag != True:
       self.C_flag = result < 0
       result %= 256
     if op == 'dec':
