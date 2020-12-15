@@ -14,9 +14,9 @@
 module RegFile (Clk,WriteEn,Destination,RaddrA,DataIn,DataOutA,DataOutB);
 	parameter W=8, D=2;  // W = data path width (Do not change); D = pointer width (You may change)
 	input                Clk,
-								WriteEn;
+								WriteEn,
 								Destination;  // 0 for accumulator, 1 for other register
-	input        [D-1:0] RaddrA,				  // address pointers
+	input        [D-1:0] RaddrA;				  // address pointers
 	input        [W-1:0] DataIn;
 	output reg   [W-1:0] DataOutA;
 	output reg   [W-1:0] DataOutB;
@@ -34,15 +34,18 @@ reg [W-1:0] Accumulator;	            // special accumulator register
 always@*
 begin
  DataOutA = Accumulator;
- DataOutB = Registers[RaddrB];
+ DataOutB = Registers[RaddrA];
 end
 
 // sequential (clocked) writes 
-always @ (posedge Clk)
+always @ (posedge Clk) begin
   if (WriteEn)	                             // works just like data_memory writes
 		if (Destination)
-			Registers[Waddr] <= DataIn;
+			Registers[RaddrA] <= DataIn;
 		else
 			Accumulator <= DataIn;
+
+//$display("\tWriteEn: %h, DataIn: %h, Destination: %h", WriteEn, DataIn, Destination);
+end
 
 endmodule

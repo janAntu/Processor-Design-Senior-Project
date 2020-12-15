@@ -97,7 +97,7 @@ module CPU(Reset, Start, Clk,Ack);
 	);
 
 
-	CZReg #(.W(1)) CZ (
+	CZReg #(.W(1),.D(1)) CZ (
 		.Clk    		(Clk),
 		.WriteEn   (RegWrEn), 
 		.ZIn    (ZeroIn),
@@ -111,17 +111,17 @@ module CPU(Reset, Start, Clk,Ack);
 	assign InA = ReadA;						                       // connect RF out to ALU in
 	assign InB = ReadB;
 	assign Instr_opcode = Instruction[8:7];
-	assign MemWrite = (Instruction[8:5] == 4'b0101);                 // mem_store command
+	assign MemWrite = (Instruction == 9'h0101);                 // mem_store command
 	assign RegWriteValue = 
 		Instruction[8:7] == 2'b11 ? Instruction[6:0] : // If SETQ, get literal from instruction
 		(LoadInst ? MemReadValue : ALU_out);  // Otherwise, 2:1 switch into reg_file
 	assign Destination = 
 	  (Instruction[8:7] == 2'b00 && Instruction[6:4] != 3'b000) ?
 		Instruction[2] : 0;  // Destination is always Q except for ALU ops
-	assign RegWrEn = !(   // Set reg write for all insts EXCEPT:
+	assign RegWriteEn = !(   // Set reg write for all insts EXCEPT:
 		(Instruction[8:7] == 2'b10) ||        // Branch
 		(Instruction[8:5] == 4'b0101) ||     // SW
-		(Instruction[8:3] == 6'b000001) ||  // CMPZ and CMPC
+		(Instruction[8:2] == 7'b0000011) ||  // CMPZ and CMPC
 		(Instruction[8:1] == 8'b00000011) || // CPLC and CLRC
 		(Instruction == 9'b000000001)        // JUMP
 	);
@@ -155,16 +155,10 @@ module CPU(Reset, Start, Clk,Ack);
 	
 // count number of instructions executed
 // Help you with debugging
-	always @(posedge Clk) begin
+	always @(posedge Clk)
 	  if (Start == 1)	   // if(start)
 		 CycleCt <= 0;
 	  else if(Ack == 0)   // if(!halt)
 		 CycleCt <= CycleCt+16'b1;
-	
-		// $display("\tRegWrEn: %h, RegWriteValue: %h, Destination: %h",
-		// 				RegWrEn,
-		// 				RegWriteValue,
-		// 				Destination);
-	end
 
 endmodule

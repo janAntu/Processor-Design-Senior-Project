@@ -13,16 +13,16 @@
   # If input is 0, return early
   LW $0 0
   CLR $1 F
-  CMP $1
+  CMPZ $1
   BNE input_validated
   LW $0 1
-  CMP $1
+  CMPZ $1
   BNE input_validated
   HALT
 input_validated:
   # Step 2: Set B to highest power of 4 <= N
   LW $0 0   # Set Q to N[0]
-  CMP $1    # Compare Q to 0
+  CMPZ $1    # Compare Q to 0
   BNE end_if1
   INC $0 F  # Moves the frame pointer
 end_if1:
@@ -32,7 +32,7 @@ end_if1:
   MOV $1 F  # Set $1 to largest nonzero byte of N
 while_start:
   MOV $2 Q  # Set Q to B[x]
-  CMP $2    # Compare B[x] to N[x]
+  CMPC $2    # Compare B[x] to N[x]
   BGE while_end
   LSR $2 F
   LSR $2 F  # Shift B[x] 2 bits to the right
@@ -125,9 +125,10 @@ end_lsr_x:
   IOR $1 F  # $1 = $1 OR MSB of B
   # MSB is now zero if B == 0
   CLR $3 Q  # Set Q to 0
-print
-  CMP $1    # If B != 0, loop again
-  BNE big_loop_begin
+#print
+  CMPZ $1    # If B != 0, loop again
+  BEQ 2 
+  JUMP big_loop_begin
   # Now that the square root is in 18 and 19, move *19 to *18
   LW $0 3
   SW $0 2

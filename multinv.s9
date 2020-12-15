@@ -5,16 +5,20 @@ SETQ 8    # Address of D[0]
 MOV $0 F
 LW $0 0   # Now Q contains D[0]
 MOV $1 F  # Now $1 contains D[0]
-SETQ 129  # Since we can only compare LT or GE, set to 0x80+1
-CMP $1
+SETQ 127  # Since we can only compare LT or GE, set to 0x80+1
+CLR $3 F
+INC $3 F  # Since our SETQ instruction goes up to 127, we have to
+INC $3 F  # use another register to add 2
+ADD $3 Q
+CMPC $1
 BLT 1     # Skip the next instruction if D[0] < 129
 HALT
 LW $0 1   # Now let's load D[1]
 MOV $2 F  # Store D[1] in $2
 CLR $3 Q  # Set Q = 0
-CMP $1
+CMPZ $1
 BNE 3     # If D[0] != 0, skip to step 2
-CMP $2
+CMPZ $2
 BNE 1     # If D[1] != 0, skip to step 2
 HALT      # If D[0] and D[1] are both zero, quit
 # 2: Initialize N=0x01, R=0x0000, i=17
@@ -33,7 +37,7 @@ DEC $3 F  # i = i - 1
 MOV $3 Q
 SW $0 7
 CLR $3 Q 
-CMP $3
+CMPZ $3
 BNE 2  # if i == 0 skip the jump to step 4
 SETQ 98
 JUMPQ
@@ -59,20 +63,20 @@ SW $0 5   # Store R[0] back to memory
 # Goal: Subtract R - D and get carry
 CLR $3 F
 LW $0 1
-CMP $2
+CMPC $2
 BGE 1
 INC $3 F
 SUB $2 F
 LW $0 0
 ADD $3 Q
 CLR $3 F
-CMP $1
+CMPC $1
 BGE 1
 INC $3 F
 SUB $1 F
 # If carry == 0, R := R - D
 CLR $3 Q  # Set Q to 0 (reg # doesn't matter)
-CMP $3
+CMPZ $3
 BNE 4     # If carry == 0, skip the next four lines
 MOV $1 Q
 SW $0 5   # Store $1 to R[0]

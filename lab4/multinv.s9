@@ -5,7 +5,11 @@ SETQ 8    # Address of D[0]
 MOV $0 F
 LW $0 0   # Now Q contains D[0]
 MOV $1 F  # Now $1 contains D[0]
-SETQ 129  # Since we can only compare LT or GE, set to 0x80+1
+SETQ 127  # Since we can only compare LT or GE, set to 0x80+1
+CLR $3 F
+INC $3 F  # Since our SETQ instruction goes up to 127, we have to
+INC $3 F  # use another register to add 2
+ADD $3 Q
 CMPC $1
 BLT 1     # Skip the next instruction if D[0] < 129
 HALT
@@ -27,6 +31,7 @@ SETQ 17
 SW $0 7   # Set i = 17
 # 3:  Registers for this section:
 # $0: 20, $1: R[0]/Qu[0], $2: R[1]/Qu[1], $3: i or carry
+loop_start:
 LW $0 7   # Fetch i from memory
 MOV $3 F  # Move i to $3
 DEC $3 F  # i = i - 1
@@ -35,8 +40,7 @@ SW $0 7
 CLR $3 Q 
 CMPZ $3
 BNE 2  # if i == 0 skip the jump to step 4
-SETQ 98
-JUMPQ
+JUMP loop_end
 LW $0 4
 MOV $3 F  # Store N in $3 for later use
 CLR $3 Q
@@ -95,6 +99,6 @@ MOV $2 F
 SW $0 3   # Store Qu[1] back to memory
 MOV $1 Q
 SW $0 2   # Store Qu[0] back to memory
-SETQ 27
-JUMPQ     # Go back to beginning of step 3
+JUMP loop_start     # Go back to beginning of step 3
+loop_end:
 HALT      # We finished!! Reciprocal is stored in 10 and 11

@@ -22,16 +22,18 @@ module Ctrl (Instruction, CFlag, ZFlag, Jump, BranchEn);
 	// jump on right shift that generates a zero
 	always@*
 	begin
-          Jump = 0;
-          BranchEn = 0;
 	  if(Instruction ==  9'b000000001)
 		 Jump = 1;
+	  else
+		 Jump = 0;
 		 
-	if((Instruction[8:5] ==  4'b1000 && ZFlag) || 
-	   (Instruction[8:5] ==  4'b1001 && !ZFlag) ||
-	   (Instruction[8:5] ==  4'b1010 && CFlag) ||
-	   (Instruction[8:5] ==  4'b1011 && !CFlag)) 
-		BranchEn = 1;
+		if((Instruction[8:5] ==  4'b1000 && ZFlag) || 
+		   (Instruction[8:5] ==  4'b1001 && !ZFlag) ||
+		   (Instruction[8:5] ==  4'b1010 && CFlag) ||
+		   (Instruction[8:5] ==  4'b1011 && !CFlag)) 
+		 BranchEn = 1;
+	  else
+		 BranchEn = 0;
 		 
 		 
 	end

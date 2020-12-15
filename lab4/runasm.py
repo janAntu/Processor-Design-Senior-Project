@@ -159,14 +159,11 @@ class Processor:
     # Transform instructions into a list of 9-bit binary strings
     self.preprocess()
     bitstr_iter = map(self.assemble_single, self.instructions)
-    bitstr = ''.join(bitstr_iter)
-    # Append trailing zeroes so that length is a multiple of 8
-    bitstr += '0'*(8 - (len(bitstr)) % 8)
-    # Convert binary string to an array of bytes
-    byte_array = int(bitstr, 2).to_bytes(len(bitstr)//8, 'big')
-    print(byte_array)
-    with open(filename, 'wb') as fout:
-      fout.write(byte_array)
+
+    # Print each 9-bit string to file    
+    with open(filename, 'w') as fout:
+      for bitstr in bitstr_iter:
+        fout.write(bitstr + '\n')
 
   def __repr__(self):
     if self.PC < len(self.instructions):
@@ -177,8 +174,8 @@ class Processor:
         sys.stderr.write(str(self.memory[16:22]) + '\n')
     else:
       instr = "---------"
-    return "PC: {0}\tInst: {1}\tRegs: {2}\tQ: {3}\tC: {4}".format(
-          self.PC, instr, self.regs, self.W, self.C_flag)
+    return "PC: {0}\tInst: {1}\tRegs: {2}\tQ: {3}\tC: {4}\tZ: {5}".format(
+          self.PC, instr, self.regs, self.W, self.C_flag, self.Z_flag)
 
   def run_all(self, log='END'):
     self.preprocess()
@@ -291,9 +288,13 @@ class Processor:
 
   def run_misc(self, ops):
     if ops[0] == 'cmp':
+      print("Deprecated command, CMP")
+    if ops[0] == 'cmpc':
+      f = self.regs[int(ops[1])]
+      self.C_flag = f < self.W
+    elif ops[0] == 'cmpz':
       f = self.regs[int(ops[1])]
       self.Z_flag = self.W == f
-      self.C_flag = f < self.W
     elif ops[0] == 'halt':
       self.PC = len(self.instructions)
     elif ops[0] == 'setq':
@@ -343,7 +344,7 @@ def test_sqrt():
 
 test_sqrt()
 '''
-mem = [0, 179, 8,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 17, 0]
+mem = [0, 179, 8, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 2, 17, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 elif len(sys.argv) == 2:

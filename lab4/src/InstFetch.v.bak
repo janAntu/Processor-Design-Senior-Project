@@ -22,16 +22,16 @@ module InstFetch(Reset,Start,Clk,BranchAbs,BranchRelEn,Target,TargetRel,ProgCtr)
   
   
   //// program counter can clear to 0, increment, or jump
-	always@(posedge Clk)
+	always
 	begin 
 		if(Reset)
 		  ProgCtr <= 0;				        // for first program; want different value for 2nd or 3rd
 		else if(Start)						     // hold while start asserted; commence when released
-		  ProgCtr <= ProgCtr+'b1;
+		  ProgCtr <= ProgCtr;
 		else if(BranchAbs)	              // unconditional absolute jump
-		  ProgCtr <= Target+'b1;
+		  ProgCtr <= Target;
 		else if(BranchRelEn)   // conditional relative jump
-		  ProgCtr <= TargetRel + ProgCtr+'b1;
+		  ProgCtr <= TargetRel + ProgCtr;
 		else
 		  ProgCtr <= ProgCtr+'b1; 	        // default increment (no need for ARM/MIPS +4. Pop quiz: why?)
 	end

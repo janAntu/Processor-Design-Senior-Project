@@ -21,8 +21,8 @@ module CZReg (Clk,WriteEn,ZIn,CIn,ZOut,COut);
 	output reg   [W-1:0] COut;				
 
 // W bits wide [W-1:0] and 2**4 registers deep 	 
-reg [W-1:0] ZeroFlag;
-reg [W-1:0] CarryFlag;
+reg ZeroFlag;
+reg CarryFlag;
 
 
 

@@ -82,7 +82,7 @@ class Processor:
         'beq': '00',
         'bne': '01',
         'blt': '10',
-        'bgt': '11'
+        'bge': '11'
       }.get(op, None)
       # Ensure that literal value is between 0 and 31
       offset = int(ops[1])
@@ -159,14 +159,11 @@ class Processor:
     # Transform instructions into a list of 9-bit binary strings
     self.preprocess()
     bitstr_iter = map(self.assemble_single, self.instructions)
-    bitstr = ''.join(bitstr_iter)
-    # Append trailing zeroes so that length is a multiple of 8
-    bitstr += '0'*(8 - (len(bitstr)) % 8)
-    # Convert binary string to an array of bytes
-    byte_array = int(bitstr, 2).to_bytes(len(bitstr)//8, 'big')
-    print(byte_array)
-    with open(filename, 'wb') as fout:
-      fout.write(byte_array)
+
+    # Print each 9-bit string to file    
+    with open(filename, 'w') as fout:
+      for bitstr in bitstr_iter:
+        fout.write(bitstr + '\n')
 
   def __repr__(self):
     if self.PC < len(self.instructions):
@@ -219,9 +216,8 @@ class Processor:
     op, offset = ops[0], int(ops[1])
     if ((op == 'beq' and self.Z_flag == True) or
         (op == 'bne' and self.Z_flag == False) or
-        (op == 'blt' and self.B_flag == True) or
-        (op == 'jnc' and self.C_flag == False) or
-        (op == 'bge' and self.B_flag == False)):
+        (op == 'blt' and self.C_flag == True) or
+        (op == 'bge' and self.C_flag == False)):
       
       # Update the program counter
       self.PC += offset
@@ -353,7 +349,7 @@ def test_sqrt():
 
 test_sqrt()
 '''
-mem = [0, 179, 8,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 17, 0]
+mem = [0, 179, 8,0, 0, 0, 0, 13, 13, 13, 13, 0, 0, 0, 0, 0, 2, 17, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 elif len(sys.argv) == 2:
