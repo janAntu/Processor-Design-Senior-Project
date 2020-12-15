@@ -2,7 +2,7 @@ import sys
 import re
 
 BRANCH_OPS = ['beq', 'bne', 'blt', 'bge']
-ALU_OPS = ['sub', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
+ALU_OPS = ['sub','subc', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
 LS_OPS = ['lw', 'sw']
 MISC_OPS = ['cmp', 'cmpz', 'cmpc', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp', 'cplc', 'clrc']
 
@@ -108,7 +108,8 @@ class Processor:
         'movf': '1011',
         'lsl': '1100',
         'clr': '1101',
-        'lsr': '1110'
+        'lsr': '1110',
+        'subc': '1111'
       }.get(op, None)
 
       # Add destination bit for F or Q
@@ -230,6 +231,11 @@ class Processor:
       result = f - self.W
       self.C_flag = result < 0
       result %= 256
+    if op == 'subc':
+      result = f - self.W
+      if self.C_flag == False:
+        self.C_flag = result < 0
+      result %= 256
     if op == 'dec':
       result = f - 1
     if op == 'or' or op == 'ior':
@@ -344,7 +350,7 @@ def test_sqrt():
 
 test_sqrt()
 '''
-mem = [0, 179, 8, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 2, 17, 0]
+mem = [0, 1, 2, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 2, 17, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 elif len(sys.argv) == 2:

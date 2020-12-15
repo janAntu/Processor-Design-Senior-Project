@@ -51,13 +51,13 @@ Step2:
    SETQ 2      # Q = 2
    MOV $0 F    # $0 = 2
    LW $0 0     # Now Q contains D[2], divisor LSB
-   SUB $3 Q   # Q = Divdend[1] - Q
+   SUBC $3 Q   # Q = Divdend[1] - Q
    CLR $0 F    # $0 = 0
    SW $0 1     # D[1] = Q
    SETQ 3      # Q = 3
    MOV $0 F    # $0 = 3
    LW $0 0     # Now Q contains D[3], divisor MSB
-   SUB $2 Q    # Q = Dividend[0] - Q
+   SUBC $2 Q    # Q = Dividend[0] - Q
    CLR $0 F    # $0 = 0
    SW $0 0     # D[0] = Q
    BGE Step3   # JNC
@@ -103,7 +103,7 @@ CHECKER:
    SETQ 1      # Q = 1
    MOV $0 F    # $0 = 1
    LW $0 0     # Now Q = D[1], remainder
-   SUB $2 Q    # Q = 8 - remainder
+   SUBC $2 Q    # Q = 8 - remainder
    MOV $3 F    # $3 = 8 - remainder (counter)
    SETQ 1      # Q = 1
    MOV $0 F    # $0 = 1

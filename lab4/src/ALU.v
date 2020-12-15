@@ -54,6 +54,11 @@ module ALU(InputA,InputB,OP,MOP,ZeroIn,CarryIn,Out,ZeroOut,CarryOut);
 			Out = InputA - InputB;
 			CarryOut = (InputA < InputB) ? 1 : 0;
 		end
+		4'b1111: begin				// SUBC
+			Out = InputA - InputB;
+			if(CarryIn == 0)
+				CarryOut = (InputA < InputB) ? 1 : 0;
+		end
 		4'b0011: Out = InputA - 1; 		// DEC
 		4'b0100: Out = InputA | InputB; // OR
 		4'b0101: Out = InputA & InputB; // AND
@@ -66,7 +71,6 @@ module ALU(InputA,InputB,OP,MOP,ZeroIn,CarryIn,Out,ZeroOut,CarryOut);
 		4'b1100: Out = InputA << 1; 		// Shift left
 		4'b1101: Out = 8'b0; 						// CLEAR
 		4'b1110: Out = {1'b0,InputA[7:1]};  // Shift right
-		//4'b1111: // N/A
 		default: Out = 0;
 	  endcase
 
@@ -74,6 +78,8 @@ module ALU(InputA,InputB,OP,MOP,ZeroIn,CarryIn,Out,ZeroOut,CarryOut);
 		if ((OP[3] == 1'b0 && OP[3:1] != 3'b000) ||
 		    (OP == 4'b1001) || (OP == 4'b1010) ||(OP == 4'b1101))
 			ZeroOut = (Out == 0) ? 1 : 0;
+
+		if ()
 	
 	end 
 

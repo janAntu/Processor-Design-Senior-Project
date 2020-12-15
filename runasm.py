@@ -2,7 +2,7 @@ import sys
 import re
 
 BRANCH_OPS = ['beq', 'bne', 'blt', 'bge', 'jnc']
-ALU_OPS = ['sub', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
+ALU_OPS = ['sub', 'subc', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
 LS_OPS = ['lw', 'sw']
 MISC_OPS = ['cmp', 'cmpz', 'cmpc', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp', 'cplc', 'clrc']
 
