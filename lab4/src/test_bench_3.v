@@ -52,7 +52,7 @@ initial begin
   #10; start = 1;
   #20;  init = 0;
 // insert operand
-  dat_in3 = 256;// Max : 65535;		   // *** try various values here ***
+  dat_in3 = 190;// Max : 65535;		   // *** try various values here ***
 // *** change names of memory or its guts as needed ***
   dut.DM1.Core[16] = dat_in3[15: 8];
   dut.DM1.Core[17] = dat_in3[ 7: 0]; 

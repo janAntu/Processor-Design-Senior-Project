@@ -77,7 +77,7 @@ module CPU(Reset, Start, Clk,Ack);
 	.InstOut       (Instruction)
 	);
 	
-	assign LoadInst = Instruction[8:5]==4'b0100;  // calls out load specially
+	assign LoadInst = Instruction[8:6]==3'b010;  // calls out load specially
 	
 	always@*
 	begin
@@ -113,9 +113,9 @@ module CPU(Reset, Start, Clk,Ack);
 	assign InA = ReadA;						                       // connect RF out to ALU in
 	assign InB = ReadB;
 	assign Instr_opcode = Instruction[8:7];
-	assign MemWrite = (Instruction[8:5] == 4'b0101);                 // mem_store command
+	assign MemWrite = (Instruction[8:6] == 3'b011);                 // mem_store command
 	assign MemWriteValue = ReadA;
-	assign MemAddr = ReadB + Instruction[4:2];
+	assign MemAddr = ReadB + Instruction[5:2];
 	assign RegWriteValue = 
 		Instruction[8:7] == 2'b11 ? Instruction[6:0] : // If SETQ, get literal from instruction
 		(LoadInst ? MemReadValue : ALU_out);  // Otherwise, 2:1 switch into reg_file
@@ -124,7 +124,7 @@ module CPU(Reset, Start, Clk,Ack);
 		Instruction[2] : 0;  // Destination is always Q except for ALU ops
 	assign RegWrEn = !(   // Set reg write for all insts EXCEPT:
 		(Instruction[8:7] == 2'b10) ||        // Branch
-		(Instruction[8:5] == 4'b0101) ||     // SW
+		(Instruction[8:6] == 3'b011) ||     // SW
 		(Instruction[8:3] == 6'b000001) ||  // CMPZ and CMPC
 		(Instruction[8:1] == 8'b00000011) || // CPLC and CLRC
 		(Instruction == 9'b000000001)        // JUMP

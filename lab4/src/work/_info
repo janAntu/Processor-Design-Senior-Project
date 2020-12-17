@@ -9,7 +9,7 @@ z2
 cModel Technology
 dC:/Users/loyal/Documents/CSE 140L/cse140l-lab1/testbench/simulation/modelsim
 vALU
-Z0 !s110 1608088431
+Z0 !s110 1608177652
 !i10b 1
 !s100 g;S[VHnKSE[MHaTO<@bbj2
 Id4e4gPb<CEGL=UeE`B7g93
@@ -23,7 +23,7 @@ Z3 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z4 !s108 1608088431.000000
+Z4 !s108 1608177652.000000
 !s107 C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/ALU.v|
 !s90 -reportprogress|300|-work|work|C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/ALU.v|
 !i113 1
@@ -33,11 +33,11 @@ n@a@l@u
 vCPU
 R0
 !i10b 1
-!s100 6Da;XSz[BUJBNkT3B6bK[0
-I=m24Mci=Dk^k1jm7HzMfo2
+!s100 b8TLWJUXRi7f];HDYOQSW2
+I<GLbM?g2ZKB@34071^Mho1
 R1
 R2
-w1608080829
+w1608172274
 8C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/CPU.v
 FC:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/CPU.v
 L0 15
@@ -75,7 +75,7 @@ R5
 R6
 n@ctrl
 vCZReg
-Z8 !s110 1608088432
+Z8 !s110 1608177653
 !i10b 1
 !s100 fUEl]3C?_HW73U_Rf`NkF3
 I[ZlYLfakB:JD`6mA9O;230
@@ -89,7 +89,7 @@ R3
 r1
 !s85 0
 31
-R4
+Z10 !s108 1608177653.000000
 !s107 C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/CZReg.v|
 !s90 -reportprogress|300|-work|work|C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/CZReg.v|
 !i113 1
@@ -111,7 +111,7 @@ R3
 r1
 !s85 0
 31
-Z10 !s108 1608088432.000000
+R10
 !s107 C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/DataMem.v|
 !s90 -reportprogress|300|-work|work|C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/DataMem.v|
 !i113 1
@@ -141,13 +141,13 @@ R5
 R6
 n@inst@fetch
 vInstROM
-Z11 !s110 1608088433
+Z11 !s110 1608177654
 !i10b 1
 !s100 9h0[2FU9S3bZdaCbUF0o81
 Ia_Kb0CG<9<<^fc15c0bQR3
 R1
 R2
-w1608088187
+w1608177408
 8C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/InstROM.v
 FC:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/InstROM.v
 L0 17
@@ -177,7 +177,7 @@ R3
 r1
 !s85 0
 31
-Z12 !s108 1608088433.000000
+Z12 !s108 1608177654.000000
 !s107 C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/LUT.v|
 !s90 -reportprogress|300|-work|work|C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/LUT.v|
 !i113 1
@@ -185,7 +185,7 @@ R5
 R6
 n@l@u@t
 vRegFile
-R11
+Z13 !s110 1608177655
 !i10b 1
 !s100 L_U8GBLYcBooMz?SlSX;o3
 I0bg_7D==X1VE7<dXVSPng2
@@ -207,13 +207,13 @@ R5
 R6
 n@reg@file
 vtest_bench_1
-!s110 1608078977
+!s110 1608177083
 !i10b 1
-!s100 =?d@U^d_kI3FzAe2DkI8:0
-I_ZM^PUU=`L;B[hYgl2Fdn0
+!s100 1B8oL?P@U;zJnUzB7Xe1j1
+I]bV9DASMHJ64B6V0lWj_L1
 R1
 R2
-w1608078944
+w1608177066
 8C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_1.v
 FC:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_1.v
 L0 8
@@ -221,20 +221,20 @@ R3
 r1
 !s85 0
 31
-!s108 1608078977.000000
+!s108 1608177083.000000
 !s107 C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_1.v|
 !s90 -reportprogress|300|-work|work|C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_1.v|
 !i113 1
 R5
 R6
 vtest_bench_2
-!s110 1608087776
+!s110 1608177342
 !i10b 1
-!s100 oR>_ER:cIMORPL<fWFkPX1
-IfB7HlmBhA8A<0ELUR:dLe3
+!s100 DBEhHXUbdX0oGBFoB<CUG0
+IP:L8F=A:2:7FL`l2bn;_Y1
 R1
 R2
-w1608087758
+w1608177325
 8C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_2.v
 FC:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_2.v
 L0 8
@@ -242,20 +242,20 @@ R3
 r1
 !s85 0
 31
-!s108 1608087775.000000
+!s108 1608177342.000000
 !s107 C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_2.v|
 !s90 -reportprogress|300|-work|work|C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_2.v|
 !i113 1
 R5
 R6
 vtest_bench_3
-!s110 1608088434
+R13
 !i10b 1
-!s100 mg@AcD]3A2Q>b33V<L9:b0
-I?NID5^@bV>`Zdh>3I`=4_2
+!s100 dWX=>j[J;S8FFibYkY90R0
+II9;^EAB9@EGHem4E=<O1Y1
 R1
 R2
-w1608088412
+w1608177635
 8C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_3.v
 FC:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_3.v
 L0 7
@@ -263,7 +263,7 @@ R3
 r1
 !s85 0
 31
-R12
+!s108 1608177655.000000
 !s107 C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_3.v|
 !s90 -reportprogress|300|-work|work|C:/Users/loyal/Desktop/Fall 2020/CSE 141L/scripts/lab4/src/test_bench_3.v|
 !i113 1

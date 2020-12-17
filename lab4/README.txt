@@ -7,10 +7,22 @@
 Our team managed to complete all three programs, and so each of these programs
 work on our processor.
 
+The greatest challenges we faced were translating our similated processor into
+Verilog circuits. During Lab 1, we wrote a program in Python to run our three
+programs and simulate the processor, and this helped us ensure that our
+assembly programs were correct. However, translating this design into Verilog
+code was challenging, especially when we realized we needed to modify our ISA.
+
 > Video Link
+https://ucsd.zoom.us/rec/share/3f3HPkl8ZASdd8dZ_IjNHIiQ5e9heTel_BJuXdFIacTPXuiinoUiwzvzRfVsrD2U.5OkXwLD2GaLzXIMP
+Passcode: tP*M4zXX 
 
 > Rounding vs. Flooring
 Our programs use flooring instead of rounding.
+
+> Using the Assembler
+To assemble a file, use runasm.py like below:
+$ python runasm.py [assembly file] [target file]
 
 > Testbenches
 We modified all three of the testbenches and included them in our submission

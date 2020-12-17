@@ -123,11 +123,11 @@ class Processor:
 
     elif op in LS_OPS:
       bit_string += '01'
-      bit_string += '00' if op == 'lw' else '01'
+      bit_string += '0' if op == 'lw' else '1'
       # Ensure that literal value is between 0 and 8
       offset = int(ops[2])
-      assert offset < 8 and offset >= 0, "Offset value {0} out of range".format(offset)
-      bit_string += binary(offset, 3)
+      assert offset < 16 and offset >= 0, "Offset value {0} out of range".format(offset)
+      bit_string += binary(offset, 4)
       # Ensure that literal value is between 0 and 3
       register = int(ops[1])
       assert register < 4 and register >= 0, "Register value {0} out of range".format(register)
@@ -364,7 +364,7 @@ def test_sqrt():
 
 test_sqrt()
 '''
-mem = [1, 0, 6, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 23, 112, 0]
+mem = [1, 129, 6, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 23, 112, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 elif len(sys.argv) == 2:
