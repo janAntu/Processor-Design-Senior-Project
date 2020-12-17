@@ -1,0 +1,100 @@
+# Program to find the reciprocal of a two-byte number
+# Input number is in addresses 8 and 9, output goes in 10 and 11
+# 1: If D = 0 or D[0] > 0x80, return early
+SETQ 0    # Address of D[0]
+MOV $0 F
+LW $0 2   # Move D byte to address 3
+SW $0 3
+CLR $0 Q
+SW $0 2
+LW $0 2   # Now Q contains D[0]
+MOV $1 F  # Now $1 contains D[0]
+LW $0 3   # Now let's load D[1]
+MOV $2 F  # Store D[1] in $2
+CLR $3 Q  # Set Q = 0
+CMPZ $1
+BNE 3     # If D[0] != 0, skip to step 2
+CMPZ $2
+BNE 1     # If D[1] != 0, skip to step 2
+HALT      # If D[0] and D[1] are both zero, quit
+# 2: Initialize N=0x01, R=0x0000, i=17
+SETQ 1    # We'll store N in 12
+SW $0 6   # Set N = 0x01
+CLR $3 Q  # Set Q = 0
+SW $0 7   # Set R[0] = 0x00
+SW $0 8   # Set R[1] = 0x00
+SETQ 17
+SW $0 9   # Set i = 17
+# 3:  Registers for this section:
+# $0: 20, $1: R[0]/Qu[0], $2: R[1]/Qu[1], $3: i or carry
+loop_start:
+LW $0 9   # Fetch i from memory
+MOV $3 F  # Move i to $3
+DEC $3 F  # i = i - 1
+MOV $3 Q
+SW $0 9
+CLR $3 Q 
+CMPZ $3
+BNE 2  # if i == 0 skip the jump to step 4
+JUMP loop_end
+LW $0 6
+MOV $3 F  # Store N in $3 for later use
+CLR $3 Q
+SW $0 6   # Set N to 0
+# R = R << 1 + N
+LW $0 7
+MOV $1 F
+LW $0 8
+MOV $2 F  # Store R[0] and R[1] in $1 and $2
+LSL $1 F  # R[0] << 1
+LSL $2 F  # R[1] << 1, carry set if R[1] too large
+BGE 1     # Execute following commands if carry set
+INC $1 F  # If carry was set, R[0] += 1
+MOV $2 Q
+ADD $3 Q
+MOV $2 F  # R += N
+SW $0 8   # Store R[1] back to memory
+MOV $1 Q
+SW $0 7   # Store R[0] back to memory
+# Goal: Subtract R - D and get carry
+CLR $3 F
+LW $0 3
+CMPC $2
+BGE 1
+INC $3 F
+SUB $2 F
+LW $0 2
+ADD $3 Q
+CLR $3 F
+CMPC $1
+BGE 1
+INC $3 F
+SUB $1 F
+# If carry == 0, R := R - D
+CLR $3 Q  # Set Q to 0 (reg # doesn't matter)
+CMPZ $3
+BNE 4     # If carry == 0, skip the next four lines
+MOV $1 Q
+SW $0 7   # Store $1 to R[0]
+MOV $2 Q
+SW $0 8   # Store $2 to R[1]
+# Quotient = Quotient << 1 + ~carry
+SETQ 1
+XOR $3 F  # Toggle carry by xoring it with 1
+LW $0 4
+MOV $1 F
+LW $0 5
+MOV $2 F  # Store Qu[0] and Qu[1] in $1 and $2
+LSL $1 F  # Qu[0] << 1
+LSL $2 F  # Qu[1] << 1, carry set if Qu[1] too large
+BGE 1     # Execute following commands if carry set
+INC $1 F  # If carry was set, Qu[0] += 1
+MOV $2 Q
+ADD $3 Q  # Qu += carry from subtraction above
+MOV $2 F
+SW $0 5   # Store Qu[1] back to memory
+MOV $1 Q
+SW $0 4   # Store Qu[0] back to memory
+JUMP loop_start     # Go back to beginning of step 3
+loop_end:
+HALT      # We finished!! Reciprocal is stored in 10 and 11

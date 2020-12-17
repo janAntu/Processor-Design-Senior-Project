@@ -35,7 +35,8 @@ begin
 end
 
 // sequential (clocked) writes
-always @ (posedge Clk) begin
+always @ (posedge Clk)
+	if (WriteEn) begin
 		ZeroFlag <= ZIn;
 		CarryFlag <= CIn;
 end

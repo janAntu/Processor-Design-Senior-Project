@@ -36,7 +36,7 @@ always begin
        clk = 0;
   #5; clk = 1;
   #5;
-  $display("Cycle: %d, PC: %d, Inst: %b, Q: %h, R0: %h, R1: %h, R2: %h, R3: %h, Z: %h, done: %h",
+  $display("Cycle: %d, PC: %d, Inst: %b, Q: %h, R0: %h, R1: %h, R2: %h, R3: %h, Z: %h, C: %h",
            dut.CycleCt,
            dut.PgmCtr,
            dut.Instruction,
@@ -46,23 +46,23 @@ always begin
            dut.RF1.Registers[2],
            dut.RF1.Registers[3],
            dut.CZ.ZeroFlag,
-           done);
+           dut.CZ.CarryFlag);
 end
 
 initial begin
 
 // launch program 1
   start = 1;
+  #20;  init = 0;
   dividend = 64'h8000_0000_0000_0000;	   // this is 1.000000000
   // *** try various values here ***
-  divisor1 = 3;		// This is testing 1/4, which would produce hex value 2000        
+  divisor1 = 1024;		// This is testing 1/4, which would produce hex value 2000        
 // your memory gets loaded here
 // *** change names of memory or its guts as needed ***
   dut.DM1.Core[8] = divisor1[15:8];
   dut.DM1.Core[9] = divisor1[ 7:0];
   if(divisor1) div1;										// regal value of nonzero vector = 1;
   else result1 = '1;    // 1/0 = all 1's (maximum value; "saturating reg")
-  #20;  init = 0;
   #20; start = 0;
   #20;
   wait(done);

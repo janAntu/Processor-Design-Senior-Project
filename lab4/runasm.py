@@ -2,7 +2,7 @@ import sys
 import re
 
 BRANCH_OPS = ['beq', 'bne', 'blt', 'bge']
-ALU_OPS = ['sub', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
+ALU_OPS = ['sub','subc', 'dec', 'ior', 'or', 'and', 'xor', 'add', 'mov', 'com', 'inc', 'decs', 'lsr', 'lsl', 'clr', 'swap', 'incs']
 LS_OPS = ['lw', 'sw']
 MISC_OPS = ['cmp', 'cmpz', 'cmpc', 'halt', 'setq', 'jumpq', 'rrc', 'rlc', 'setfp', 'cplc', 'clrc']
 
@@ -108,7 +108,8 @@ class Processor:
         'movf': '1011',
         'lsl': '1100',
         'clr': '1101',
-        'lsr': '1110'
+        'lsr': '1110',
+        'subc': '1111'
       }.get(op, None)
 
       # Add destination bit for F or Q
@@ -152,7 +153,7 @@ class Processor:
         bit_string += binary(register, 2)
 
     assert len(bit_string) == 9, "Assembler error on instruction '{0}' translated as {1}".format(instr, bit_string)
-    print(bit_string, '  ', instr)
+    #print(bit_string, '  ', instr)
     return bit_string
 
   def assemble(self, filename):
@@ -171,11 +172,24 @@ class Processor:
       instr = instr.split('#')[0]
       # If instruction is "print", output memory to stderr
       if instr == "print":
-        sys.stderr.write(str(self.memory[16:22]) + '\n')
+        pass #sys.stderr.write(str(self.memory[16:22]) + '\n')
     else:
       instr = "---------"
-    return "PC: {0}\tInst: {1}\tRegs: {2}\tQ: {3}\tC: {4}\tZ: {5}".format(
-          self.PC, instr, self.regs, self.W, self.C_flag, self.Z_flag)
+      return instr
+    return "Instr: {:12s}PC {:03d}, Inst: {:}, Q: {:02x}, R0: {:02x}, R1: {:02x}, R2: {:02x}, R3: {:02x}, Z: {:02x}, C: {:02x}".format(
+      instr,
+      self.PC,
+      self.assemble_single(instr),
+      self.W,
+      self.regs[0],
+      self.regs[1],
+      self.regs[2],
+      self.regs[3],
+      self.Z_flag,
+      self.C_flag
+    )
+    #return "PC: {0}\tInst: {1}\tRegs: {2}\tQ: {3}\tC: {4}\tZ: {5}".format(
+    #      self.PC, instr, self.regs, self.W, self.C_flag, self.Z_flag)
 
   def run_all(self, log='END'):
     self.preprocess()
@@ -228,9 +242,14 @@ class Processor:
     result = None
     if op == 'sub':
       result = f - self.W
-      #if self.C_flag != True:
       self.C_flag = result < 0
       result %= 256
+    if op == 'subc':
+      result = f - self.W
+      if self.C_flag == False:
+        self.C_flag = result < 0
+      result %= 256
+      print("subc ", result)
     if op == 'dec':
       result = f - 1
     if op == 'or' or op == 'ior':
@@ -345,7 +364,7 @@ def test_sqrt():
 
 test_sqrt()
 '''
-mem = [0, 179, 8, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 2, 17, 0]
+mem = [1, 0, 6, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 23, 112, 0]
 if len(sys.argv) == 1:
   print("Don't forget a filename!")
 elif len(sys.argv) == 2:

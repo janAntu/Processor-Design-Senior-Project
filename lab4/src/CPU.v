@@ -29,12 +29,14 @@ module CPU(Reset, Start, Clk,Ack);
 	wire [ 7:0] InA, InB, 	   // ALU operand inputs
 					ALU_out;       // ALU result
 	wire [ 7:0] RegWriteValue, // data in to reg file
+					MemAddr,
 					MemWriteValue, // data in to data_memory
 					MemReadValue;  // data out from data_memory
 
 	// Control Wires
 	wire    MemWrite,	   // data_memory write enable
 				  RegWrEn,	   // reg_file write enable
+					CZWrEn,
 					Jump,	       // to program counter: jump 
 					BranchEn,	   // to program counter: branch enable
 					Destination,
@@ -99,7 +101,7 @@ module CPU(Reset, Start, Clk,Ack);
 
 	CZReg #(.W(1)) CZ (
 		.Clk    		(Clk),
-		.WriteEn   (RegWrEn), 
+		.WriteEn   (CZWrEn), 
 		.ZIn    (ZeroIn),
 		.CIn    (CarryIn), 
 		.ZOut  (ZeroOut),
@@ -112,6 +114,8 @@ module CPU(Reset, Start, Clk,Ack);
 	assign InB = ReadB;
 	assign Instr_opcode = Instruction[8:7];
 	assign MemWrite = (Instruction[8:5] == 4'b0101);                 // mem_store command
+	assign MemWriteValue = ReadA;
+	assign MemAddr = ReadB + Instruction[4:2];
 	assign RegWriteValue = 
 		Instruction[8:7] == 2'b11 ? Instruction[6:0] : // If SETQ, get literal from instruction
 		(LoadInst ? MemReadValue : ALU_out);  // Otherwise, 2:1 switch into reg_file
@@ -125,6 +129,8 @@ module CPU(Reset, Start, Clk,Ack);
 		(Instruction[8:1] == 8'b00000011) || // CPLC and CLRC
 		(Instruction == 9'b000000001)        // JUMP
 	);
+	assign CZWrEn = (Instruction[8:7] == 2'b00) &&
+		(Instruction != 9'b000000001);
 	
 
 	// Arithmetic Logic Unit
@@ -143,7 +149,7 @@ module CPU(Reset, Start, Clk,Ack);
 	 
 	 // Data Memory
 	 	DataMem DM1(
-		.DataAddress  (ReadA), 
+		.DataAddress  (MemAddr), 
 		.WriteEn      (MemWrite), 
 		.DataIn       (MemWriteValue), 
 		.DataOut      (MemReadValue), 

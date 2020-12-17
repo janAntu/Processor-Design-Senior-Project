@@ -46,7 +46,7 @@ module InstROM (InstAddress, InstOut) ;
   always@* InstOut = inst_rom[InstAddress];
  
   initial begin		                  // load from external text file
-  	$readmemb("program1",inst_rom);
+  	$readmemb("program3",inst_rom);
   end 
   
 endmodule

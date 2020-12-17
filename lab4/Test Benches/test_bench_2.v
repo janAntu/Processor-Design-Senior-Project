@@ -30,36 +30,39 @@ reg[15:0] result1,	   // desired final result, rounded to 16 bits
             result1_DUT;   // actual result from DUT
 real quotientR;			   // quotient in $real format
 
-
 // program 2 variables
 reg[15:0] div_in2;	   // dividend 2 to DUT
 reg[ 7:0] divisor2;	   // divisor 2 to DUT
 reg[23:0] result2,	   // desired final result, rounded to 24 bits
             result2_DUT;   // actual result from DUT
-			
-// program 3 variables
-reg[15:0] dat_in3;	   // operand to DUT
-reg[ 7:0] result3;	   // expected SQRT(operand) result from DUT
-reg[47:0] square3;	   // internal expansion of operand
-reg[ 7:0] result3_DUT;   // actual SQRT(operand) result from DUT
-real argument, result, 	   // reals used in test bench square root algorithm
-     error, result_new;
 	 
 // clock -- controls all timing, data flow in hardware and test bench
 always begin
        clk = 0;
   #5; clk = 1;
   #5;
+  $display("Cycle: %d, PC: %d, Inst: %b, Q: %h, R0: %h, R1: %h, R2: %h, R3: %h, Z: %h, C: %h",
+           dut.CycleCt,
+           dut.PgmCtr,
+           dut.Instruction,
+           dut.RF1.Accumulator,
+           dut.RF1.Registers[0],
+           dut.RF1.Registers[1],
+           dut.RF1.Registers[2],
+           dut.RF1.Registers[3],
+           dut.CZ.ZeroFlag,
+           dut.CZ.CarryFlag);
 end
 
 initial begin
 
 // preload operands and launch program 2
   #10; start = 1;	
+  #20;  init = 0;
 // The test below is calculating 3/255
 // insert dividend and divisor
-  div_in2 = 3;	   	// *** try various values here ***
-  divisor2 = 8'hFF;		   // *** try various values here ***
+  div_in2 = 385;	   	// *** try various values here ***
+  divisor2 = 6;		   // *** try various values here ***
 // *** change names of memory or its guts as needed ***
   dut.DM1.Core[0] = div_in2[15:8];
   dut.DM1.Core[1] = div_in2[ 7:0];
